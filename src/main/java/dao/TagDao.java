@@ -25,20 +25,15 @@ public class TagDao {
     public void updateTag(Integer id, String tagname) {
         List<TagsRecord> tagRecords = dsl.selectFrom(TAGS).where(TAGS.ID.eq(id)).and(TAGS.TAG.eq(tagname)).fetch();
 
-        System.out.println(tagRecords);
         if (tagRecords.size() == 0) {
             dsl.insertInto(TAGS, TAGS.ID, TAGS.TAG).values(id, tagname).execute();
         } else {
             dsl.deleteFrom(TAGS).where(TAGS.ID.eq(id)).and(TAGS.TAG.eq(tagname)).execute();
         }
-
-        tagRecords = dsl.selectFrom(TAGS).fetch();
-        System.out.println(tagRecords);
     }
 
     public List<ReceiptsRecord> getReceiptsByTag(String tagname) {
         List<TagsRecord> tagRecords = dsl.selectFrom(TAGS).where(TAGS.TAG.eq(tagname)).fetch();
-        System.out.print(tagRecords);
         return dsl.selectFrom(RECEIPTS).where(RECEIPTS.ID.in(dsl.selectFrom(TAGS).where(TAGS.TAG.eq(tagname)).fetch().getValues(TAGS.ID))).fetch();
     }
 }
