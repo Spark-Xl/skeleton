@@ -4,6 +4,7 @@
 <head>
     <link rel="stylesheet" href="style.css" />
     <script data-require="jquery@*" data-semver="3.1.1" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    
     <script>
         const api = "http://localhost:8080";
 
@@ -38,12 +39,13 @@
             })
         }
     </script>
+
 </head>
 
 <body>
 <DIV id="container">
     <h1 style="margin: 25px">My receipts</h1>
-    <button class="button" id="add-receipt" style="margin: 25px">+</button>
+    <button class="button" id="add-receipt" style="margin: 25px" onclick="showPanel()">+</button>
     <div id="panelView" style="clear: both; text-align: center;"></div>
     <div id="receiptList" style="margin: 20px">
         <table class="table" id="receiptsTable" border="1" style="width:100%; text-align: center;">
@@ -57,6 +59,8 @@
     </div>
 </DIV>
 </body>
+
+<!-- UI related functions -->
 
 <script type="text/javascript">
     function cancelAdding () {
@@ -118,9 +122,10 @@
         thisTagNode.append(template);
         $(".add-tag", thisReceipt).attr("disabled", true);
 
-        $(".tag_input", ".tags", thisReceipt).on('keypress', function (e) {
+        $(".tag_input", thisTagNode).on('keypress', function (e) {
             if(e.which === 13){
-                var tagName = $(".tagInput", $(this)).val();
+                var tagName = $(this).val();
+                if (tagName == '') return;
                 $(this).attr("disabled", "disabled");
                 AJAX_updateTag(thisRecord.id, tagName, thisTagNode);
             }
@@ -134,9 +139,7 @@
 
 </script>
 
-<script>
-    $("#add-receipt").click(showPanel)
-</script>
+<!-- TODO -->
 
 <script type="text/javascript">
 
@@ -171,6 +174,8 @@
     }
 
 </script>
+
+<!-- AJAX -->
 
 <script type="text/javascript">
 
@@ -218,6 +223,8 @@
     }
 </script>
 
+<!-- template for add receipt panel and tag name input -->
+
 <script id="addReceip-template" type="text/spark's-template">
     <div class="addReceiptPanel">
         <input type="text" id="merchant" class="receiptInput" name="merchantName" placeholder="merchant"><br>
@@ -232,10 +239,9 @@
 </script>
 
 <script id="tagInput-template" type="text/spark's-template">
-    <div class="tag_input">
-        <input type="text" class="tagInput" name="tagInput"><br>
+    <div>
+        <input type="text" class="tag_input" name="tagInput"><br>
     </div>
 </script>
-
 
 </html>
