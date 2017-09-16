@@ -2,11 +2,131 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="style.css" />
     <script data-require="jquery@*" data-semver="3.1.1" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+    <style type="text/css">
+        #container {border: 1px solid black;}
+        H1 {float: left;}
+
+        .button{
+            background-color: #ff9900;
+            border: 1px solid #229;
+            width: 100px;
+            float: right;
+            font-size: 2em;
+            color: white;
+            text-align: center;
+        }
+
+        .addReceiptPanel {
+            background-color: #ff9900;
+            border-style: bold;
+            border-radius: 10px;
+            border-width: 1px;
+            margin-left: 20px;
+            margin-right: 20px;
+            padding-bottom: 10px;
+        }
+
+        #receiptList {
+            border: 1px solid green;
+            clear: both;
+        }
+
+        .receipt {
+            background-color: #clear;
+            margin-bottom: 5px;
+        }
+
+        .table {
+            background-color: #cee2f4;
+        }
+
+        .add-tag {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            margin-left: 20px;
+            margin-right: 20px;
+
+            background-color: #6b9cee;
+            color: #fff;
+            border-radius: 8px;
+            border-style: solid;
+            border-width: 1px;
+            width: 30%;
+        }
+
+        .tagValue {
+            margin-left: 20px;
+            margin-right: 20px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+
+            background-color: #fff3ca;
+            border-radius: 8px;
+            border-style: solid;
+            border-width: 1px;
+        }
+
+        .removeTagButtom {
+            background-color: transparent;
+            border-style: none;
+        }
+
+        .receiptInput {
+            width: 70%;
+            height: 30px;
+
+            margin: 10px;
+            background-color: transparent;
+            color: #fff;
+            font-size: 20px;
+            font-weight:bold;
+            padding-left: 5px;
+        }
+
+        .panelButton {
+            margin: 15px;
+            border-radius: 8px;
+            border-style: solid;
+            border-width: 1px;
+
+            font-size: 100%;
+            font-weight:bold;
+            color: white;
+            text-align: center;
+            width: 70px;
+            height: 40px;
+        }
+
+        .panelError {
+            width: 70%;
+            border-radius: 5px;
+            background-color: #fff;
+            color: red;
+            font-size: 18px;
+            font-style: italic;
+        }
+
+        .tagInput {
+            margin-bottom: 5px;
+
+            border-radius: 3px;
+            border-style: solid;
+            border-width: 1px;
+            width: 25%;
+        }
+
+        ::-webkit-input-placeholder {
+            color: #fff;
+            font-style: italic;
+            font-size: 20px;
+            padding-left: 5px;
+        }
+    </style>
     
     <script>
-        const api = "http://localhost:8080";
+        const api = "http://54.245.11.9:8080";
 
         var allReceipts;
         $(reloadReceipts)
