@@ -101,6 +101,15 @@
             font-style: italic;
         }
 
+        .tagInput {
+            margin-bottom: 5px;
+
+            border-radius: 3px;
+            border-style: solid;
+            border-width: 1px;
+            width: 25%;
+        }
+
         ::-webkit-input-placeholder {
             color: #fff;
             font-style: italic;
