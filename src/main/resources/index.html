@@ -139,26 +139,15 @@
 
 </script>
 
-<!-- TODO -->
+<!-- time converter -->
 
 <script type="text/javascript">
 
-    function getElapsedTime(timeString) {
-        var startDate = new Date("1/1/1900 " + timeString);
-        var endDate = Date.now();
-        var elapsed = endDate - startDate;
+    function getElapsedTime(timestamp) {
+        var currentTimestamp = new Date().getTime();
+        var elapsed = currentTimestamp - timestamp;
         return msToTime(elapsed);
     }
-
-    // function getElapsedTime(timeString) {
-    //     var currentTimeInSecond = (new Date().getHou);
-    //     return msToTime(currentTimeInSecond - timeToSeconds(timeString));
-    // }
-
-    // function timeToSeconds(timeString) {
-    //     timeString = timeString.split(/:/);
-    //     return timeString[0] * 3600 + timeString[1] * 60 + timeString[2];
-    // }
 
     function msToTime(duration) {
         var milliseconds = parseInt((duration%1000)/100)

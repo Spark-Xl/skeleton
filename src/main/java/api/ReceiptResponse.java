@@ -3,9 +3,10 @@ package api;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import generated.tables.records.ReceiptsRecord;
 import generated.tables.records.TagsRecord;
+import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
-import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -29,7 +30,7 @@ public class ReceiptResponse {
     BigDecimal value;
 
     @JsonProperty
-    Time created;
+    Timestamp created;
 
     @JsonProperty
     String [] tags;
