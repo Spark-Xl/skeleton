@@ -7,20 +7,26 @@
     <script>
         const api = "http://localhost:8080"; // <- do not need a root api URL if this page is served directly by the API
 
+        var allReceipts;
+
         // This is the idiomatic way to ensure that JQuery does not
         // execute until the page has loaded
         $(reloadReceipts)
 
         function reloadReceipts() {
+            $(".receipt").remove();
+
             $.getJSON(api+"/receipts", function(receipts){
+                allReceipts = receipts
+                console.log(receipts);
                 for(var i=0; i < receipts.length; i++) {
                     var receipt = receipts[i];
                     receipt.created = getElapsedTime(receipt.created);
 
                     var tagHTML = '';
 
-                    $.each(receipt.tags, function (i, item) {
-                        tagHTML += '<div class="tagValue">' + item + '&ensp;<button class="removeTagButtom">&#10005;</button></div>';                 
+                    $.each(receipt.tags, function (j, item) {
+                        tagHTML += '<div class="tagValue" onclick="removeTag(' + i +',' + j + ')">' + item + '&ensp;<button class="removeTagButtom">&#10005;</button></div>';                 
                     })
                     tagHTML += '<button class="add-tag"> Add +</button>';
                     tagHTML = '<td class="tags">' + tagHTML + '</td>';
@@ -71,7 +77,7 @@
 
 <script type="text/javascript">
     function cancelAdding () {
-        $(".addReceiptPanel").remove();
+        hidePanel();
     }
 
     function saveAdding () {
@@ -88,27 +94,9 @@
             return;
         }
 
-
         var parameters = {"merchant": merchantName, "amount": amountValue};
 
-        $.ajax({
-            beforeSend: function(xhrObj){
-                xhrObj.setRequestHeader("Content-Type","application/json");
-                xhrObj.setRequestHeader("Accept","application/json");
-            },
-            url: 'http://localhost:8080/receipts',
-            type: 'POST',
-            data: JSON.stringify(parameters),
-            success: function(result) {
-                clearErrorMessage();
-                $(".addReceiptPanel").remove();
-                $(reloadReceipts)
-            },
-            error: function(jqXHR, exception) {
-                var err = 'Error: ' + jqXHR.responseText;
-                setErrorMessage(err);
-            }
-        })
+        AJAX_createReceipt(parameters);
     }
 
     function setErrorMessage(message) {
@@ -119,12 +107,26 @@
         $('#panelErrorView').text('');
     }
 
+    function removeTag(recordIndex, tagIndex) {
+        var thisRecord = allReceipts[recordIndex]
+        var recordId = thisRecord.id;
+        var tagName = thisRecord.tags[tagIndex];
+
+        AJAX_updateTag(recordId, tagName);
+    }
+
+    function hidePanel() {
+        $(".addReceiptPanel").remove();
+        $("#add-receipt").attr("disabled", false);
+    }
+
 </script>
 
 <script>
     $("#add-receipt").click(function () {
         var template = $('#addReceip-template').html();
         $('#panelView').append(template);
+        $("#add-receipt").attr("disabled", true);
     })
 </script>
 
@@ -159,6 +161,51 @@
 
         return hours + minutes + seconds;
     }
+
+</script>
+
+<script type="text/javascript">
+
+    function AJAX_createReceipt(parameters) {
+        $.ajax({
+            beforeSend: function(xhrObj){
+                xhrObj.setRequestHeader("Content-Type","application/json");
+                xhrObj.setRequestHeader("Accept","application/json");
+            },
+            url: api+'/receipts',
+            type: 'POST',
+            data: JSON.stringify(parameters),
+            success: function(result) {
+                clearErrorMessage();
+                hidePanel();
+                $(reloadReceipts)
+            },
+            error: function(jqXHR, exception) {
+                var err = 'Error: ' + jqXHR.responseText;
+                setErrorMessage(err);
+            }
+        })
+    }
+
+    function AJAX_updateTag(recordId, tagName) {
+        $.ajax({
+            beforeSend: function(xhrObj){
+                xhrObj.setRequestHeader("Content-Type","application/json");
+                xhrObj.setRequestHeader("Accept","application/json");
+            },
+            url: api+'/tags/' + tagName,
+            type: 'PUT',
+            data: JSON.stringify(recordId),
+            success: function(result) {
+                $(reloadReceipts)
+            },
+            error: function(jqXHR, exception) {
+                var err = 'Error: ' + jqXHR.responseText;
+                setErrorMessage(err);
+            }
+        })
+    }
+
 
 </script>
 
