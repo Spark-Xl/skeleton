@@ -5,11 +5,11 @@
     <link rel="stylesheet" href="style.css" />
     <script data-require="jquery@*" data-semver="3.1.1" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <style>
-        #container {border: 1px solid brown;}
+        #container {border: 1px solid black;}
         H1 {float: left;}
 
         .button{
-            background-color:#55A;
+            background-color: #ff9900;
             border: 1px solid #229;
             width: 100px;
             float: right;
@@ -24,8 +24,43 @@
         }
 
         .receipt {
-            background-color: #eee;
+            background-color: #clear;
             margin-bottom: 5px;
+        }
+
+        .table {
+            background-color: #cee2f4;
+        }
+
+        .addButton {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            margin-left: 20px;
+            margin-right: 20px;
+
+            background-color: #6b9cee;
+            color: #fff;
+            border-radius: 8px;
+            border-style: solid;
+            border-width: 1px;
+            width: 30%;
+        }
+
+        .tagLabel {
+            margin-left: 20px;
+            margin-right: 20px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+
+            background-color: #fff3ca;
+            border-radius: 8px;
+            border-style: solid;
+            border-width: 1px;
+        }
+
+        .removeTagButtom {
+            background-color: transparent;
+            border-style: none;
         }
 
     </style>
@@ -38,8 +73,26 @@
             $.getJSON(api+"/receipts", function(receipts){
                 for(var i=0; i < receipts.length; i++) {
                     var receipt = receipts[i];
-                    $(`<div class="receipt">${receipt.merchantName}<div><span class="receiptTag">${receipt.receipt}</span></div></div>`)
-                        .appendTo($("#receiptList"));
+                    receipt.created = getElapsedTime(receipt.created);
+
+                    var tagHTML = '';
+
+                    $.each(receipt.tags, function (i, item) {
+                        tagHTML += '<div class="tagLabel">' + item + '&ensp;<button class="removeTagButtom">&#10005;</button></div>';                 
+                    })
+                    tagHTML += '<button class="addButton"> Add +</button>';
+                    tagHTML = '<td class="tags">' + tagHTML + '</td>';
+
+                    $(`<tr class="receipt">
+                            <td class="time">${receipt.created}</td>
+                            <td class="merchant">${receipt.merchantName}</td>
+                            <td class="amount">${receipt.value}$</td>
+                            ${tagHTML}
+                        </tr>`)
+                        .appendTo($("#receiptsTable"));
+                    $.each(receipt.tags, function (i, item) {
+
+                    })
                 }
             })
         })
@@ -48,11 +101,59 @@
 
 <body>
 <DIV id="container">
-    <h1>My receipts</h1>
-    <div class="button">+</div>
-    <div id="receiptList">
+    <h1 style="margin: 25px">My receipts</h1>
+    <button class="button" id="addReceipBtn" style="margin: 25px">+</button>
+    <div id="receiptList" style="margin: 20px">
+        <table class="table" id="receiptsTable" border="1" style="width:100%; text-align: center;">
+          <tr>
+            <th>Time</th>
+            <th>Merchant</th>
+            <th>$</th>
+            <th>Tags</th>
+          </tr>
+        </table>
     </div>
 </DIV>
 </body>
+
+<script>
+    $("#addReceipBtn").click(function () {
+        console.log(123 + $('.merchant', $('.receipt')[0]).text());
+    })
+</script>
+
+<script type="text/javascript">
+
+    function getElapsedTime(timeString) {
+        var startDate = new Date("1/1/1900 " + timeString);
+        var endDate = Date.now();
+        var elapsed = endDate - startDate;
+        return msToTime(elapsed);
+    }
+
+    // function getElapsedTime(timeString) {
+    //     var currentTimeInSecond = (new Date().getHou);
+    //     return msToTime(currentTimeInSecond - timeToSeconds(timeString));
+    // }
+
+    // function timeToSeconds(timeString) {
+    //     timeString = timeString.split(/:/);
+    //     return timeString[0] * 3600 + timeString[1] * 60 + timeString[2];
+    // }
+
+    function msToTime(duration) {
+        var milliseconds = parseInt((duration%1000)/100)
+            , seconds = parseInt((duration/1000)%60)
+            , minutes = parseInt((duration/(1000*60))%60)
+            , hours = parseInt((duration/(1000*60*60))%24);
+
+        hours = (hours == 0) ? "": hours + "h ";
+        minutes = (minutes == 0 && hours == 0) ? "": minutes + "m ";
+        seconds = seconds + "s ago"
+
+        return hours + minutes + seconds;
+    }
+
+</script>
 
 </html>
