@@ -2,115 +2,16 @@
 <html>
 
 <head>
+    <link rel="stylesheet" href="style.css" />
     <script data-require="jquery@*" data-semver="3.1.1" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <style>
-        #container {border: 1px solid black;}
-        H1 {float: left;}
-
-        .button{
-            background-color: #ff9900;
-            border: 1px solid #229;
-            width: 100px;
-            float: right;
-            font-size: 2em;
-            color: white;
-            text-align: center;
-        }
-
-        .addReceiptPanel {
-            background-color: #ff9900;
-            border-style: bold;
-            border-radius: 10px;
-            border-width: 1px;
-            margin-left: 20px;
-            margin-right: 20px;
-        }
-
-        #receiptList {
-            border: 1px solid green;
-            clear: both;
-        }
-
-        .receipt {
-            background-color: #clear;
-            margin-bottom: 5px;
-        }
-
-        .table {
-            background-color: #cee2f4;
-        }
-
-        .add-tag {
-            margin-top: 10px;
-            margin-bottom: 10px;
-            margin-left: 20px;
-            margin-right: 20px;
-
-            background-color: #6b9cee;
-            color: #fff;
-            border-radius: 8px;
-            border-style: solid;
-            border-width: 1px;
-            width: 30%;
-        }
-
-        .tagValue {
-            margin-left: 20px;
-            margin-right: 20px;
-            margin-top: 5px;
-            margin-bottom: 5px;
-
-            background-color: #fff3ca;
-            border-radius: 8px;
-            border-style: solid;
-            border-width: 1px;
-        }
-
-        .removeTagButtom {
-            background-color: transparent;
-            border-style: none;
-        }
-
-        .receiptInput {
-            width: 70%;
-            height: 30px;
-
-            margin: 10px;
-            background-color: transparent;
-            color: #fff;
-            font-size: 20px;
-            font-weight:bold;
-            padding-left: 5px;
-        }
-
-        .panelButton {
-            margin: 15px;
-            border-radius: 8px;
-            border-style: solid;
-            border-width: 1px;
-
-            font-size: 100%;
-            font-weight:bold;
-            color: white;
-            text-align: center;
-            width: 70px;
-            height: 40px;
-        }
-
-        ::-webkit-input-placeholder {
-            color: #fff;
-            font-style: italic;
-            font-size: 20px;
-            padding-left: 5px;
-        }
-
-    </style>
     <script>
+        const api = "http://localhost:8080"; // <- do not need a root api URL if this page is served directly by the API
+
         // This is the idiomatic way to ensure that JQuery does not
         // execute until the page has loaded
-        $(function(){
-            const api = "http://localhost:8080"; // <- do not need a root api URL if this page is served directly by the API
+        $(reloadReceipts)
 
+        function reloadReceipts() {
             $.getJSON(api+"/receipts", function(receipts){
                 for(var i=0; i < receipts.length; i++) {
                     var receipt = receipts[i];
@@ -133,7 +34,7 @@
                         .appendTo($("#receiptsTable"));
                 }
             })
-        })
+        }
     </script>
 </head>
 
@@ -157,14 +58,15 @@
 
 <script id="addReceip-template" type="text/spark's-template">
     <div class="addReceiptPanel">
-        <input type="text" id="#merchant" class="receiptInput" placeholder="merchant"><br>
-        <input type="text" id="#amount" class="receiptInput" placeholder="amount"><br>
+        <input type="text" id="merchant" class="receiptInput" name="merchantName" placeholder="merchant"><br>
+        <input type="text" id="amount" class="receiptInput" name="amountValue" placeholder="amount"><br>
 
         <div style="display: flex; justify-content: flex-end; width: 85%">
             <button class="panelButton" id="cancel-receipt" style="background-color: red" onclick="cancelAdding()">cancel</button>
             <button class="panelButton" id="save-receipt" style="background-color: green" onclick="saveAdding()">save</button>
         </div>
-    <div>
+        <center><div id="panelErrorView" class="panelError"></div></center>
+    </div>
 </script>
 
 <script type="text/javascript">
@@ -173,16 +75,56 @@
     }
 
     function saveAdding () {
+        var merchantName = $('#merchant').val();
+        var amountValue = $('#amount').val();
 
+        if (merchantName == "") {
+            setErrorMessage('Please input Merchant name!');
+            return;
+        }
+
+        if (amountValue != '' && !$.isNumeric(amountValue)) {
+            setErrorMessage('Please input numberic Amount value!');
+            return;
+        }
+
+
+        var parameters = {"merchant": merchantName, "amount": amountValue};
+
+        $.ajax({
+            beforeSend: function(xhrObj){
+                xhrObj.setRequestHeader("Content-Type","application/json");
+                xhrObj.setRequestHeader("Accept","application/json");
+            },
+            url: 'http://localhost:8080/receipts',
+            type: 'POST',
+            data: JSON.stringify(parameters),
+            success: function(result) {
+                clearErrorMessage();
+                $(".addReceiptPanel").remove();
+                $(reloadReceipts)
+            },
+            error: function(jqXHR, exception) {
+                var err = 'Error: ' + jqXHR.responseText;
+                setErrorMessage(err);
+            }
+        })
     }
+
+    function setErrorMessage(message) {
+        $('#panelErrorView').text(message);
+    }
+
+    function clearErrorMessage() {
+        $('#panelErrorView').text('');
+    }
+
 </script>
 
 <script>
     $("#add-receipt").click(function () {
         var template = $('#addReceip-template').html();
         $('#panelView').append(template);
-
-        console.log(123 + $('.merchant', $('.receipt')[0]).text());
     })
 </script>
 
