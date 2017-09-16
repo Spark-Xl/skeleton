@@ -2,7 +2,6 @@
 <html>
 
 <head>
-    <link rel="stylesheet" href="style.css" />
     <script data-require="jquery@*" data-semver="3.1.1" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <style>
         #container {border: 1px solid black;}
@@ -16,6 +15,15 @@
             font-size: 2em;
             color: white;
             text-align: center;
+        }
+
+        .addReceiptPanel {
+            background-color: #ff9900;
+            border-style: bold;
+            border-radius: 10px;
+            border-width: 1px;
+            margin-left: 20px;
+            margin-right: 20px;
         }
 
         #receiptList {
@@ -32,7 +40,7 @@
             background-color: #cee2f4;
         }
 
-        .addButton {
+        .add-tag {
             margin-top: 10px;
             margin-bottom: 10px;
             margin-left: 20px;
@@ -46,7 +54,7 @@
             width: 30%;
         }
 
-        .tagLabel {
+        .tagValue {
             margin-left: 20px;
             margin-right: 20px;
             margin-top: 5px;
@@ -61,6 +69,39 @@
         .removeTagButtom {
             background-color: transparent;
             border-style: none;
+        }
+
+        .receiptInput {
+            width: 70%;
+            height: 30px;
+
+            margin: 10px;
+            background-color: transparent;
+            color: #fff;
+            font-size: 20px;
+            font-weight:bold;
+            padding-left: 5px;
+        }
+
+        .panelButton {
+            margin: 15px;
+            border-radius: 8px;
+            border-style: solid;
+            border-width: 1px;
+
+            font-size: 100%;
+            font-weight:bold;
+            color: white;
+            text-align: center;
+            width: 70px;
+            height: 40px;
+        }
+
+        ::-webkit-input-placeholder {
+            color: #fff;
+            font-style: italic;
+            font-size: 20px;
+            padding-left: 5px;
         }
 
     </style>
@@ -78,9 +119,9 @@
                     var tagHTML = '';
 
                     $.each(receipt.tags, function (i, item) {
-                        tagHTML += '<div class="tagLabel">' + item + '&ensp;<button class="removeTagButtom">&#10005;</button></div>';                 
+                        tagHTML += '<div class="tagValue">' + item + '&ensp;<button class="removeTagButtom">&#10005;</button></div>';                 
                     })
-                    tagHTML += '<button class="addButton"> Add +</button>';
+                    tagHTML += '<button class="add-tag"> Add +</button>';
                     tagHTML = '<td class="tags">' + tagHTML + '</td>';
 
                     $(`<tr class="receipt">
@@ -90,9 +131,6 @@
                             ${tagHTML}
                         </tr>`)
                         .appendTo($("#receiptsTable"));
-                    $.each(receipt.tags, function (i, item) {
-
-                    })
                 }
             })
         })
@@ -102,7 +140,8 @@
 <body>
 <DIV id="container">
     <h1 style="margin: 25px">My receipts</h1>
-    <button class="button" id="addReceipBtn" style="margin: 25px">+</button>
+    <button class="button" id="add-receipt" style="margin: 25px">+</button>
+    <div id="panelView" style="clear: both; text-align: center;"></div>
     <div id="receiptList" style="margin: 20px">
         <table class="table" id="receiptsTable" border="1" style="width:100%; text-align: center;">
           <tr>
@@ -116,8 +155,33 @@
 </DIV>
 </body>
 
+<script id="addReceip-template" type="text/spark's-template">
+    <div class="addReceiptPanel">
+        <input type="text" id="#merchant" class="receiptInput" placeholder="merchant"><br>
+        <input type="text" id="#amount" class="receiptInput" placeholder="amount"><br>
+
+        <div style="display: flex; justify-content: flex-end; width: 85%">
+            <button class="panelButton" id="cancel-receipt" style="background-color: red" onclick="cancelAdding()">cancel</button>
+            <button class="panelButton" id="save-receipt" style="background-color: green" onclick="saveAdding()">save</button>
+        </div>
+    <div>
+</script>
+
+<script type="text/javascript">
+    function cancelAdding () {
+        $(".addReceiptPanel").remove();
+    }
+
+    function saveAdding () {
+
+    }
+</script>
+
 <script>
-    $("#addReceipBtn").click(function () {
+    $("#add-receipt").click(function () {
+        var template = $('#addReceip-template').html();
+        $('#panelView').append(template);
+
         console.log(123 + $('.merchant', $('.receipt')[0]).text());
     })
 </script>
