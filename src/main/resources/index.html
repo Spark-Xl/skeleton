@@ -126,25 +126,32 @@
     </style>
     
     <script>
+        // server domain:port
         const api = "http://54.245.11.9:8080";
+        
 
+        // load the save all receips
         var allReceipts;
         $(reloadReceipts)
 
         function reloadReceipts() {
+            // clear current content
             $(".receipt").remove();
 
             $.getJSON(api+"/receipts", function(receipts){
                 allReceipts = receipts
                 for(var i=0; i < receipts.length; i++) {
                     var receipt = receipts[i];
+                    // convert timestamp to elapsed time in miliseconds
                     receipt.created = getElapsedTime(receipt.created);
 
                     var tagHTML = '';
 
                     $.each(receipt.tags, function (j, item) {
-                        tagHTML += '<div class="tagValue" onclick="removeTag(' + i +',' + j + ')">' + item + '&ensp;<button class="removeTagButtom">&#10005;</button></div>';                 
+                        // insert all tags
+                        tagHTML += '<div class="tagValue" onclick="removeTag(' + i +',' + j + ')">' + item + '&ensp;<button class="removeTagButtom">&#10005;</button></div>';
                     })
+                    // insert add tag button
                     tagHTML += '<button class="add-tag" onclick="showTagInput('+ i + ')"> Add +</button>';
                     tagHTML = '<td class="tags">' + tagHTML + '</td>';
 
@@ -223,6 +230,7 @@
     }
 
     function showPanel() {
+        // load template for add receipt panel
         var template = $('#addReceip-template').html();
         $('#panelView').append(template);
         $("#add-receipt").attr("disabled", true);
@@ -234,6 +242,7 @@
     }
 
     function showTagInput(recordIndex) {
+        // load template for tag name input
         var template = $('#tagInput-template').html();
         var thisRecord = allReceipts[recordIndex]
         var thisReceipt = $(".receipt")[recordIndex];
