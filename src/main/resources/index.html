@@ -153,15 +153,15 @@
                     })
                     // insert add tag button
                     tagHTML += '<button class="add-tag" onclick="showTagInput('+ i + ')"> Add +</button>';
-                    tagHTML = '<td class="tags">' + tagHTML + '</td>';
+                    tagHTML = '<div class="tags">' + tagHTML + '</div>';
 
-                    $(`<tr class="receipt">
-                            <td class="time">${receipt.created}</td>
-                            <td class="merchant">${receipt.merchantName}</td>
-                            <td class="amount">${receipt.value}$</td>
+                    $(`<div class="receipt">
+                            <div class="time">${receipt.created}</div>
+                            <div class="merchant">${receipt.merchantName}</div>
+                            <div class="amount">${receipt.value}</div>
                             ${tagHTML}
-                        </tr>`)
-                        .appendTo($("#receiptsTable"));
+                        </div>`)
+                        .appendTo($("#receiptList"));
                 }
             })
         }
@@ -175,7 +175,6 @@
     <button class="button" id="add-receipt" style="margin: 25px" onclick="showPanel()">+</button>
     <div id="panelView" style="clear: both; text-align: center;"></div>
     <div id="receiptList" style="margin: 20px">
-        <table class="table" id="receiptsTable" border="1" style="width:100%; text-align: center;">
           <tr>
             <th>Time</th>
             <th>Merchant</th>
