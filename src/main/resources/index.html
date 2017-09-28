@@ -40,7 +40,7 @@
 
         .table {
             background-color: #cee2f4;
-            width:80%; 
+            width:100%; 
             text-align: center;
             display: table;
             align-items: center;
@@ -127,11 +127,29 @@
             font-size: 20px;
             padding-left: 5px;
         }
+
+        body {
+            text-align: center;
+        }
+
+        video {
+            width: 400px;
+            height: 300px;
+            border: 1px solid black;
+        }
+
+        #vidwrap {
+            margin: 20px 0;
+        }
+
+        #start, #snapshot {
+            height: 3em;
+        }
     </style>
     
     <script>
         // server domain:port
-        const api = "http://54.245.11.9:8080";
+        const api = "http:localhost:8080";
 
         // load the save all receips
         var allReceipts;
@@ -178,19 +196,84 @@
                 <th>Tags</th>
             </tr>`).appendTo($("#receiptList"));
         }
+    </script>
 
+
+    <script>
+        let imageCapture;
+
+        function attachMediaStream(mediaStream) {
+            $('video')[0].srcObject = mediaStream;
+
+            // Saving the track allows us to capture a photo
+            const track = mediaStream.getVideoTracks()[0];
+            imageCapture = new ImageCapture(track);
+        }
+
+        function startVideo() {
+            navigator.mediaDevices.getUserMedia({video: {facingMode: {exact: "environment"}}})
+                .then(attachMediaStream)
+                .catch(error => {
+                    navigator.mediaDevices.getUserMedia({video: true})
+                        .then(attachMediaStream)
+                        .catch(error => {
+                            console.log('you are fooked');
+                        })
+                })
+        }
+
+        function takeSnapshot() {
+            // create a CANVAS element that is same size as the image
+            imageCapture.takePhoto()
+                .then(blob => createImageBitmap(blob))
+                .then(img => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+
+                    canvas.getContext('2d').drawImage(img, 0, 0);
+                    const base64EncodedImageData = canvas.toDataURL('image/png').split(',')[1];
+                    $.ajax({
+                        url: "/images",
+                        type: "POST",
+                        data: base64EncodedImageData,
+                        contentType: "text/plain",
+                        success: function() {},
+                   })
+                    .then(response => {
+                        $('video').after(`<div>got response: <pre>${JSON.stringify(response)}</pre></div>`);
+                    })
+                    .always(() => console.log('request complete'));
+
+                    // For debugging, you can uncomment this to see the frame that was captured
+                    // $('BODY').append(canvas);
+                });
+
+        }
+
+        $(function () {
+            $('#start').on('click', startVideo);
+            $('video').on('play', () => $('#snapshot').prop('disabled', false));
+            $('#snapshot').on('click', takeSnapshot);
+        });
     </script>
 
 </head>
 
 <body>
-<DIV id="container">
-    <h1 style="margin: 25px">My receipts</h1>
-    <button class="button" id="add-receipt" style="margin: 25px" onclick="showPanel()">+</button>
-    <div id="panelView" style="clear: both; text-align: center;"></div>
-    <div id="receiptList" class="table" border="1" align="center">
-    </div>
-</DIV>
+    <DIV id="container">
+        <h1 style="margin: 25px">My receipts</h1>
+        <button class="button" id="add-receipt" style="margin: 25px" onclick="showPanel()">+</button>
+        <button id="start">Start Video</button>
+        <button id="snapshot" disabled="true">Take a Snapshot!</button>
+        <br>
+        <div id="vidwrap">
+            <video autoplay></video>
+        </div>
+
+        <div id="panelView" style="clear: both; text-align: center;"></div>
+        <div id="receiptList" class="table" border="1" align="center"></div>
+    </DIV>
 </body>
 
 <!-- UI related functions -->
