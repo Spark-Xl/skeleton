@@ -16,6 +16,11 @@
             font-size: 2em;
             color: white;
             text-align: center;
+            height: 50px;
+            border-radius: 10px;
+            margin: 25px;
+            margin-left: 5px;
+            margin-right: 5px;
         }
 
         .addReceiptPanel {
@@ -133,8 +138,8 @@
         }
 
         video {
-            width: 550px;
-            height: 450px;
+            width: 30%;
+            height: 50%;
             border: 1px solid black;
         }
 
@@ -142,7 +147,7 @@
             margin: 20px 0;
         }
 
-        #start, #snapshot {
+        #start {
             height: 3em;
         }
     </style>
@@ -211,6 +216,10 @@
             imageCapture = new ImageCapture(track);
         }
 
+        function stopStream() {
+           track.stop();
+        }
+
         function startVideo() {
             navigator.mediaDevices.getUserMedia({video: {facingMode: {exact: "environment"}}})
                 .then(attachMediaStream)
@@ -233,6 +242,7 @@
 
                 canvas.getContext('2d').drawImage(img, 0, 0);
                 const base64EncodedImageData = canvas.toDataURL('image/png').split(',')[1];
+
                 $.ajax({
                     url: "/images",
                     type: "POST",
@@ -251,11 +261,9 @@
 
         }
 
-
         $(function () {
-            $('#start').on('click', startVideo);
-            $('video').on('play', () => $('#snapshot').prop('disabled', false));
-            $('#snapshot').on('click', takeSnapshot);
+            $('#start-camera').on('click', prepareTakingPhoto);
+            $('video').on('play', () => $('#take-pic').prop('disabled', false));
         });
     </script>
 
@@ -264,14 +272,9 @@
 <body>
     <DIV id="container">
         <h1 style="margin: 25px">My receipts</h1>
-        <button class="button" id="add-receipt" style="margin: 25px" onclick="showPanel()">+</button>
-        <button id="start">Start Video</button>
-        <button id="snapshot" disabled="true">Take a Snapshot!</button>
+        <button class="button" id="start-camera" style="font-size: 20px">Start Camera</button>
+        <button class="button" id="add-receipt" onclick="showPanel()">+</button>
         <br>
-        <div id="vidwrap">
-            <video autoplay></video>
-        </div>
-
         <div id="panelView" style="clear: both; text-align: center;"></div>
         <div id="receiptList" class="table" border="1" align="center"></div>
     </DIV>
@@ -282,6 +285,7 @@
 <script type="text/javascript">
     function cancelAdding () {
         hidePanel();
+        stopStream();
     }
 
     function saveAdding () {
@@ -320,6 +324,7 @@
     }
 
     function showPanel() {
+       hidePanel();
         // load template for add receipt panel
         var template = $('#addReceip-template').html();
         $('#panelView').append(template);
@@ -329,6 +334,19 @@
     function hidePanel() {
         $(".addReceiptPanel").remove();
         $("#add-receipt").attr("disabled", false);
+    }
+
+    function prepareTakingPhoto() {
+       hidePanel();
+       showCameraView();
+       startVideo();
+    }
+
+    function showCameraView() {
+        // load template for add receipt panel
+        var template = $('#cameraView-template').html();
+        $('#panelView').append(template);
+        $("#add-receipt").attr("disabled", true);
     }
 
     function showTagInput(recordIndex) {
@@ -438,9 +456,24 @@
         <input type="text" id="merchant" class="receiptInput" name="merchantName" placeholder="merchant"><br>
         <input type="text" id="amount" class="receiptInput" name="amountValue" placeholder="amount"><br>
 
-        <div style="display: flex; justify-content: flex-end; width: 85%">
+        <div style="display: flex; justify-content: center;">
             <button class="panelButton" id="cancel-receipt" style="background-color: red" onclick="cancelAdding()">cancel</button>
             <button class="panelButton" id="save-receipt" style="background-color: green" onclick="saveAdding()">save</button>
+        </div>
+        <center><div id="panelErrorView" class="panelError"></div></center>
+    </div>
+</script>
+
+<script id="cameraView-template" type="text/spark's-template">
+    <div class="addReceiptPanel">
+
+        <div id="vidwrap">
+            <video autoplay></video>
+        </div>
+
+        <div style="display: flex; justify-content: center;">
+            <button class="panelButton" id="cancel-receipt" style="background-color: red" onclick="cancelAdding()">cancel</button>
+            <button class="panelButton" id="take-pic" style="background-color: green" onclick="takeSnapshot()">snap</button>
         </div>
         <center><div id="panelErrorView" class="panelError"></div></center>
     </div>

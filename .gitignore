@@ -1,6 +1,7 @@
 # These are intellij project files
 *.iml
 .idea
+*gc_api_file.json
 
 # This is a cache for gradle
 .gradle
