@@ -118,7 +118,7 @@ public class ReceiptImageController {
 
             // write the image to a file
             String filename = getUniqueName();
-            File outputfile = new File("./image/" + filename + ".png");
+            File outputfile = new File("./" + filename + ".png");
             ImageIO.write(image, "png", outputfile);
 
             //TextAnnotation fullTextAnnotation = res.getFullTextAnnotation();

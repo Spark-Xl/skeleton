@@ -160,7 +160,7 @@
     
     <script>
         // server domain:port
-        const api = "http://localhost:8080";
+        const api = "http://54.245.11.9:8080";
 
         // load the save all receips
         var allReceipts;
@@ -272,6 +272,7 @@
                         thumbnail = result.thumbnail;
                         $('#take-pic').prop('disabled', false);
                         clearErrorMessage();
+                        stopStream();
                     },
                     error: function(jqXHR, exception) {
                         var err = 'Error: ' + jqXHR.responseText;

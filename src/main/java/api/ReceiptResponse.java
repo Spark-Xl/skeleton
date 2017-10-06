@@ -63,7 +63,7 @@ public class ReceiptResponse {
     }
 
     public String getBase64EncodedImage(String filename) {
-        File fi = new File("./image/" + filename + ".png");
+        File fi = new File("./" + filename + ".png");
 
         String base64 = "";
         try {
