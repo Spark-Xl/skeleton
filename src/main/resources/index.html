@@ -207,6 +207,7 @@
     <script>
         let imageCapture;
         let track;
+        var thumbnail = null;
 
         function attachMediaStream(mediaStream) {
             $('video')[0].srcObject = mediaStream;
@@ -248,7 +249,11 @@
                     type: "POST",
                     data: base64EncodedImageData,
                     contentType: "text/plain",
-                    success: function() {},
+                    success: function(result) {
+                        console.log(result);
+                        showPanelWithValues(result.merchantName, result.amount);
+                        thumbnail = result.thumbnail;
+                    },
                     error: function(jqXHR, exception) {
                         var err = 'Error: ' + jqXHR.responseText;
                         setErrorMessage(err);
@@ -306,7 +311,7 @@
             return;
         }
 
-        var parameters = {"merchant": merchantName, "amount": amountValue};
+        var parameters = {"merchant": merchantName, "amount": amountValue, "thumbnail": thumbnail};
 
         AJAX_createReceipt(parameters);
     }
@@ -328,11 +333,19 @@
     }
 
     function showPanel() {
-       hidePanel();
+        hidePanel();
         // load template for add receipt panel
         var template = $('#addReceip-template').html();
         $('#panelView').append(template);
         $("#add-receipt").attr("disabled", true);
+    }
+
+    function showPanelWithValues(merchantName, amount) {
+        showPanel();
+        console.log(merchantName);
+        console.log(amount);
+        $('#merchant').val(merchantName);
+        $('#amount').val(amount);
     }
 
     function hidePanel() {
@@ -376,6 +389,19 @@
     function hideTagInput(tagNode) {
         $(".tag_input", tagNode).remove();
         $(".add-tag", $(".receipt")[recordIndex]).attr("disabled", false);
+    }
+
+    function saveCroppedImage(img, left_x, right_x, top_y, bottom_y) {
+        const canvas = document.createElement('canvas');
+        var new_width = right_x - left_x;
+        var new_height = bottom_y - top_y;
+        canvas.width = new_width;
+        canvas.height = new_height;
+        // canvas.getContext('2d').drawImage(img, 0, 0);
+        context.drawImage(imageObj, right_x, top_y, new_width, new_height, 0, 0, new_width, new_height);
+
+        var cropped_img = canvas.toDataURL("image/png");
+        document.write('<img src="'+ cropped_img +'"/>');
     }
 
 </script>
@@ -422,6 +448,7 @@
                 clearErrorMessage();
                 hidePanel();
                 $(reloadReceipts)
+                thumbnail = null;
             },
             error: function(jqXHR, exception) {
                 var err = 'Error: ' + jqXHR.responseText;
@@ -476,7 +503,7 @@
         </div>
 
         <div style="display: flex; justify-content: center;">
-            <button class="panelButton" id="cancel-receipt" style="background-color: red" onclick="cancelAdding()">cancel</button>
+            <button class="panelButton" id="take-pic-cancel" style="background-color: red" onclick="cancelAdding()">cancel</button>
             <button class="panelButton" id="take-pic" style="background-color: green" onclick="takeSnapshot()">snap</button>
         </div>
         <center><div id="panelErrorView" class="panelError"></div></center>

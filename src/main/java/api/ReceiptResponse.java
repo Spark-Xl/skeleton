@@ -35,11 +35,15 @@ public class ReceiptResponse {
     @JsonProperty
     String [] tags;
 
+    @JsonProperty
+    String thumbnail;
+
     public ReceiptResponse(ReceiptsRecord dbRecord) {
         this.merchantName = dbRecord.getMerchant();
         this.value = dbRecord.getAmount();
         this.created = dbRecord.getUploaded();
         this.id = dbRecord.getId();
+        this.thumbnail = dbRecord.getThumbnail();
     }
 
     public void setTags(List<TagsRecord> tags) {

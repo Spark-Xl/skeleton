@@ -4,6 +4,7 @@ CREATE TABLE receipts (
   merchant VARCHAR(255),
   amount DECIMAL(12,2),
   receipt_type INT UNSIGNED,
+  thumbnail VARCHAR(255) DEFAULT NULL,
 
   PRIMARY KEY (id)
 );

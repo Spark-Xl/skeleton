@@ -3,15 +3,22 @@ package controllers;
 import api.ReceiptSuggestionResponse;
 import com.google.cloud.vision.v1.*;
 import com.google.protobuf.ByteString;
+
+import java.awt.image.BufferedImage;
 import java.math.BigDecimal;
 import java.util.Base64;
 import java.util.Collections;
+import javax.imageio.ImageIO;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import org.hibernate.validator.constraints.NotEmpty;
 import com.google.cloud.vision.v1.Vertex;
 import com.google.cloud.vision.v1.BoundingPoly;
 import java.util.List;
+import java.io.ByteArrayInputStream;
+import java.util.Base64;
+import java.io.File;
+import java.util.UUID;
 
 import static java.lang.System.out;
 
@@ -103,9 +110,21 @@ public class ReceiptImageController {
                     break;
             }
 
+            BufferedImage image = null;
+            byte[] imageByte = Base64.getDecoder().decode(base64EncodedImage);
+
+            ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
+            image = ImageIO.read(bis).getSubimage(left_x, top_y, right_x - left_x, bottom_y - top_y);
+            bis.close();
+
+            // write the image to a file
+            String filename = getUniqueName();
+            File outputfile = new File("./image/" + filename + ".png");
+            ImageIO.write(image, "png", outputfile);
+
             //TextAnnotation fullTextAnnotation = res.getFullTextAnnotation();
             ReceiptSuggestionResponse response = new ReceiptSuggestionResponse(merchantName, amount);
-            response.setBoundrary(left_x, right_x, top_y, bottom_y);
+            response.setThumbnail(filename);
 
             return response;
         }
@@ -119,6 +138,9 @@ public class ReceiptImageController {
         catch(NumberFormatException e) {
             return null;
         }
-        // long value = bd.longValue();
+    }
+
+    public String getUniqueName() {
+        return UUID.randomUUID().toString();
     }
 }
