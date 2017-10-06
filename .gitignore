@@ -2,6 +2,8 @@
 *.iml
 .idea
 *gc_api_file.json
+/image
+*.png
 
 # This is a cache for gradle
 .gradle

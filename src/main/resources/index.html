@@ -237,6 +237,9 @@
             // create a CANVAS element that is same size as the image
             imageCapture.grabFrame()
             .then(img => {
+                setErrorMessage("Uploading image to server...");
+                $('#take-pic').prop('disabled', true);
+
                 const canvas = document.createElement('canvas');
                 canvas.width = img.width;
                 canvas.height = img.height;
@@ -253,6 +256,8 @@
                         console.log(result);
                         showPanelWithValues(result.merchantName, result.amount);
                         thumbnail = result.thumbnail;
+                        $('#take-pic').prop('disabled', false);
+                        clearErrorMessage();
                     },
                     error: function(jqXHR, exception) {
                         var err = 'Error: ' + jqXHR.responseText;
@@ -497,7 +502,6 @@
 
 <script id="cameraView-template" type="text/spark's-template">
     <div class="addReceiptPanel">
-
         <div id="vidwrap">
             <video autoplay></video>
         </div>
