@@ -16,7 +16,6 @@ import com.google.cloud.vision.v1.Vertex;
 import com.google.cloud.vision.v1.BoundingPoly;
 import java.util.List;
 import java.io.ByteArrayInputStream;
-import java.util.Base64;
 import java.io.File;
 import java.util.UUID;
 

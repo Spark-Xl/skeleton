@@ -9,6 +9,10 @@ import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Base64;
+import java.nio.file.Files;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * This is an API Object.  Its purpose is to model the JSON API that we expose.
@@ -38,12 +42,16 @@ public class ReceiptResponse {
     @JsonProperty
     String thumbnail;
 
+    @JsonProperty
+    String base64EncodedImage;
+
     public ReceiptResponse(ReceiptsRecord dbRecord) {
         this.merchantName = dbRecord.getMerchant();
         this.value = dbRecord.getAmount();
         this.created = dbRecord.getUploaded();
         this.id = dbRecord.getId();
         this.thumbnail = dbRecord.getThumbnail();
+        this.base64EncodedImage = getBase64EncodedImage(thumbnail);
     }
 
     public void setTags(List<TagsRecord> tags) {
@@ -52,5 +60,16 @@ public class ReceiptResponse {
             tagsArray.add(tag.getTag());
         }
         this.tags = tagsArray.toArray(new String[0]);
+    }
+
+    public String getBase64EncodedImage(String filename) {
+        File fi = new File("./image/" + filename + ".png");
+
+        String base64 = "";
+        try {
+            byte[] fileContent = Files.readAllBytes(fi.toPath());
+            base64 = Base64.getEncoder().encodeToString(fileContent);
+        } catch(IOException ie) {}
+        return base64;
     }
 }

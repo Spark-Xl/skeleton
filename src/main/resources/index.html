@@ -41,6 +41,7 @@
         .receipt {
             background-color: #clear;
             margin-bottom: 5px;
+            vertical-align: middle;
         }
 
         .table {
@@ -150,6 +151,11 @@
         #start {
             height: 3em;
         }
+
+        .thumbnail {
+            width: 100px;
+            height: 180px;
+        }
     </style>
     
     <script>
@@ -182,11 +188,18 @@
                     tagHTML += '<button class="add-tag" onclick="showTagInput('+ i + ')"> Add +</button>';
                     tagHTML = '<td class="tags">' + tagHTML + '</td>';
 
+                    var thumbnailHTML = '';
+                    if (receipt.base64EncodedImage.length != 0) {
+                        var imageSrc = 'data:image/png;base64,' + receipt.base64EncodedImage + ' ' ;
+                        thumbnailHTML = '<td class="thumbnail"><img class="thumbnail" src=' + imageSrc + '/></td>';
+                    }
+
                     $(`<tr class="receipt">
                             <td class="time">${receipt.created}</td>
                             <td class="merchant">${receipt.merchantName}</td>
                             <td class="amount">${receipt.value}</td>
                             ${tagHTML}
+                            ${thumbnailHTML}
                         </tr>`)
                         .appendTo($("#receiptList"));
                 }
@@ -199,6 +212,7 @@
                 <th>Merchant</th>
                 <th>$</th>
                 <th>Tags</th>
+                <th>Thumbnail</th>
             </tr>`).appendTo($("#receiptList"));
         }
     </script>
